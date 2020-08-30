@@ -94,7 +94,7 @@
                         <p class="author lead">Album by <span>${artist}</span></p>
                     </div>
                     <div class="col-md-3 text-md-right text-center">
-                        <button onclick='getLyric()' class="btn btn-success">Get Lyrics</button>
+                        <button onclick="getLyric('${artist}','${title}')" class="btn btn-success">Get Lyrics</button>
                     </div>
                 </div>`
                             songResult.appendChild(p)
@@ -106,23 +106,39 @@
 
         }
 
-        function getLyric(artitst, title) {
-            fetch(`https://api.lyrics.ovh/v1/DaBaby/BOP`)
-                //fetch(`https://api.lyrics.ovh/v1/${artist}/${title}`)
-                .then(res => res.json())
+        function getLyric(artist, title) {
+            //fetch(`https://api.lyrics.ovh/v1/DaBaby/BOP`)
+            fetch(`https://api.lyrics.ovh/v1/${artist}/${title}`)
+                // .then(res => res.json())
+                .then(response => {
+                    if (response.ok) {
+                        return response.json()
+                    } else {
+                        console.log(response.statusCode)
+                        return Promise.reject('Lyric Not available for this song')
+                    }
+                })
                 .then(data => {
                     console.log(data.lyrics)
                     const lyricArear = document.getElementById("lyric")
+                    lyricArear.innerHTML = ""
                     const pre = document.createElement("pre");
                     pre.innerHTML = `
+                    <h3 class="text-white">${title}</h3>
                     <pre class="text-white">${data.lyrics}</pre>`
+                    lyricArear.appendChild(pre)
+                })
+                .catch(error => {
+                    console.log("err", error)
+                    const lyricArear = document.getElementById("lyric")
+                    lyricArear.innerHTML = ""
+                    const pre = document.createElement("pre");
+                    pre.innerHTML = `
+                    <pre class="text-white">${error}</pre>`
                     lyricArear.appendChild(pre)
                 })
 
         }
-
-
-        //fetch(`https://api.lyrics.ovh/v1/${artist}/${title}`)
     </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
